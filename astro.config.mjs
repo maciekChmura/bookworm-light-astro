@@ -6,6 +6,8 @@ import AutoImport from "astro-auto-import";
 import { defineConfig } from "astro/config";
 import remarkCollapse from "remark-collapse";
 import remarkToc from "remark-toc";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import config from "./src/config/config.json";
 
 let highlighter;
@@ -46,6 +48,18 @@ export default defineConfig({
         remarkCollapse,
         {
           test: "Table of contents",
+        },
+      ],
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "wrap",
+          properties: {
+            className: ["anchor-link"],
+          },
         },
       ],
     ],
