@@ -109,8 +109,14 @@ const tocMaxDepth = post.data.tocMaxDepth || 4;
 
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <!-- Left Spacer for Desktop Balance -->
-      <div class="hidden lg:block lg:col-span-1"></div>
+      <!-- Desktop TOC Sidebar -->
+      <aside class="hidden lg:block lg:col-span-3">
+        <TableOfContents
+          headings={headings}
+          minDepth={tocMinDepth}
+          maxDepth={tocMaxDepth}
+        />
+      </aside>
 
       <!-- Main Article Content -->
       <article class="lg:col-span-8">
@@ -143,14 +149,8 @@ const tocMaxDepth = post.data.tocMaxDepth || 4;
         </div>
       </article>
 
-      <!-- Desktop TOC Sidebar -->
-      <aside class="hidden lg:block lg:col-span-3">
-        <TableOfContents
-          headings={headings}
-          minDepth={tocMinDepth}
-          maxDepth={tocMaxDepth}
-        />
-      </aside>
+      <!-- Right Spacer for Desktop Balance -->
+      <div class="hidden lg:block lg:col-span-1"></div>
     </div>
   </div>
 </section>
