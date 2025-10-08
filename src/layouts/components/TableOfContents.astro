@@ -1,0 +1,193 @@
+---
+export interface Props {
+  headings: Array<{
+    depth: number;
+    slug: string;
+    text: string;
+  }>;
+  title?: string;
+  minDepth?: number;
+  maxDepth?: number;
+}
+
+const {
+  headings,
+  title = "Table of Contents",
+  minDepth = 2,
+  maxDepth = 4,
+} = Astro.props;
+
+// Filter headings by depth range
+const filteredHeadings = headings.filter(
+  (heading) => heading.depth >= minDepth && heading.depth <= maxDepth,
+);
+
+// Build nested tree structure
+interface TreeNode {
+  heading: (typeof filteredHeadings)[0];
+  children: TreeNode[];
+}
+
+function buildTree(headings: typeof filteredHeadings): TreeNode[] {
+  const tree: TreeNode[] = [];
+  const stack: TreeNode[] = [];
+
+  for (const heading of headings) {
+    const node: TreeNode = { heading, children: [] };
+
+    // Find the appropriate parent level
+    while (
+      stack.length > 0 &&
+      stack[stack.length - 1].heading.depth >= heading.depth
+    ) {
+      stack.pop();
+    }
+
+    if (stack.length === 0) {
+      tree.push(node);
+    } else {
+      stack[stack.length - 1].children.push(node);
+    }
+
+    stack.push(node);
+  }
+
+  return tree;
+}
+
+const tocTree = buildTree(filteredHeadings);
+---
+
+{
+  filteredHeadings.length > 0 && (
+    <nav aria-label="Table of contents" class="toc">
+      <h3 class="toc-title">{title}</h3>
+      <ul class="toc-list">
+        {tocTree.map((node) => (
+          <li class="toc-item">
+            <a href={`#${node.heading.slug}`} class="toc-link">
+              {node.heading.text}
+            </a>
+            {node.children.length > 0 && (
+              <ul class="toc-sublist">
+                {node.children.map((child) => (
+                  <li class="toc-item">
+                    <a href={`#${child.heading.slug}`} class="toc-link">
+                      {child.heading.text}
+                    </a>
+                    {child.children.length > 0 && (
+                      <ul class="toc-sublist">
+                        {child.children.map((grandchild) => (
+                          <li class="toc-item">
+                            <a
+                              href={`#${grandchild.heading.slug}`}
+                              class="toc-link"
+                            >
+                              {grandchild.heading.text}
+                            </a>
+                            {grandchild.children.length > 0 && (
+                              <ul class="toc-sublist">
+                                {grandchild.children.map((greatgrandchild) => (
+                                  <li class="toc-item">
+                                    <a
+                                      href={`#${greatgrandchild.heading.slug}`}
+                                      class="toc-link"
+                                    >
+                                      {greatgrandchild.heading.text}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--color-light, #fafafa);
+    border: 1px solid var(--color-border, #d5d5d5);
+    border-radius: 8px;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .toc-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-dark, #152035);
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border, #d5d5d5);
+    padding-bottom: 0.5rem;
+  }
+
+  .toc-list,
+  .toc-sublist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-sublist {
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .toc-item {
+    margin: 0.25rem 0;
+  }
+
+  .toc-link {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text, #747577);
+    text-decoration: none;
+    padding: 0.25rem 0;
+    word-break: break-word;
+    hyphens: auto;
+    transition: color 0.2s ease;
+  }
+
+  .toc-link:hover {
+    color: var(--color-primary, #01ad9f);
+    text-decoration: underline;
+  }
+
+  /* Smooth scrolling for anchor links */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  /* Style for anchor links added by rehype-autolink-headings */
+  :global(.anchor-link) {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  :global(.anchor-link:hover) {
+    text-decoration: none;
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    .toc {
+      position: static;
+      margin-bottom: 2rem;
+      max-height: none;
+    }
+  }
+</style>
