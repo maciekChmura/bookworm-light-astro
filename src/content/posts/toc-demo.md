@@ -8,6 +8,8 @@ categories: ["development"]
 authors: ["John Doe"]
 tags: ["web", "development", "guide"]
 draft: false
+tocMinDepth: 2
+tocMaxDepth: 3
 ---
 
 This comprehensive guide will walk you through the essential aspects of building modern web applications. From planning and design to deployment and maintenance, we'll cover everything you need to know.
