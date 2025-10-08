@@ -68,6 +68,8 @@ const postsCollection = defineCollection({
     authors: z.array(z.string()).default(["Admin"]),
     tags: z.array(z.string()).default(["others"]),
     draft: z.boolean().optional(),
+    tocMinDepth: z.number().min(1).max(6).optional(),
+    tocMaxDepth: z.number().min(1).max(6).optional(),
   }),
 });
 
