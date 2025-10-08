@@ -1,6 +1,7 @@
 ---
 import Share from "@/components/Share.astro";
 import SimilarPosts from "@/components/SimilarPosts.astro";
+import TableOfContents from "@/components/TableOfContents.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import dateFormat from "@/lib/utils/dateFormat";
 import similerItems from "@/lib/utils/similarItems";
@@ -13,13 +14,18 @@ const allAuthors = await getSinglePage("authors");
 const posts = await getSinglePage("posts");
 const { post } = Astro.props;
 const similarPosts = similerItems(post, posts, post.slug);
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const { title, description, authors, categories, image, date, tags } =
   post.data;
+
+// Get TOC configuration from frontmatter or use defaults
+const tocMinDepth = post.data.tocMinDepth || 2;
+const tocMaxDepth = post.data.tocMaxDepth || 4;
 ---
 
 <section class="section">
   <div class="container">
+    <!-- Header Section -->
     <article class="row justify-center">
       <div class="md:col-10 text-center">
         <h1 set:html={markdownify(title)} class="h2" />
@@ -30,7 +36,7 @@ const { title, description, authors, categories, image, date, tags } =
                 .filter((author) =>
                   authors
                     .map((author: string) => slugify(author))
-                    .includes(slugify(author.data.title))
+                    .includes(slugify(author.data.title)),
                 )
                 .map((author) => (
                   <a
@@ -90,12 +96,30 @@ const { title, description, authors, categories, image, date, tags } =
           )
         }
       </div>
+    </article>
 
-      <div class="md:col-10">
-        <div class="content mb-16 text-left">
+    <!-- Mobile TOC -->
+    <div class="block lg:hidden mb-8">
+      <TableOfContents
+        headings={headings}
+        minDepth={tocMinDepth}
+        maxDepth={tocMaxDepth}
+      />
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Spacer for Desktop Balance -->
+      <div class="hidden lg:block lg:col-span-1"></div>
+
+      <!-- Main Article Content -->
+      <article class="lg:col-span-8">
+        <div class="content mb-16 text-left prose prose-lg max-w-none">
           <Content />
         </div>
-        <div class="flex flex-wrap items-center justify-between">
+
+        <!-- Tags and Share -->
+        <div class="flex flex-wrap items-center justify-between border-t pt-8">
           <ul class="mr-4 mb-4 space-x-3">
             {
               tags.map((tag: string) => (
@@ -117,8 +141,17 @@ const { title, description, authors, categories, image, date, tags } =
             slug={post.id}
           />
         </div>
-      </div>
-    </article>
+      </article>
+
+      <!-- Desktop TOC Sidebar -->
+      <aside class="hidden lg:block lg:col-span-3">
+        <TableOfContents
+          headings={headings}
+          minDepth={tocMinDepth}
+          maxDepth={tocMaxDepth}
+        />
+      </aside>
+    </div>
   </div>
 </section>
 
