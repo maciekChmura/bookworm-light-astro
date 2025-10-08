@@ -60,38 +60,107 @@ const tocTree = buildTree(filteredHeadings);
 
 {
   filteredHeadings.length > 0 && (
-    <nav aria-label="Table of contents" class="toc">
-      <h3 class="toc-title">{title}</h3>
-      <ul class="toc-list">
+    <nav
+      aria-label="Table of contents"
+      class="
+        max-h-[70vh] overflow-y-auto p-4
+        bg-light border border-border rounded-lg
+        sticky top-8
+        shadow-sm hover:shadow-md
+        transition-shadow duration-300 ease-out
+        animate-fade-in-up
+        md:static md:mb-8 md:max-h-none
+        motion-reduce:animate-none motion-reduce:transition-none
+        scrollbar-thin scrollbar-thumb-border scrollbar-track-light
+      "
+    >
+      <h3
+        class="
+        text-lg font-semibold text-text-dark
+        mb-3 pb-2
+        border-b border-border
+        tracking-tight leading-tight
+        md:text-base md:mb-2
+      "
+      >
+        {title}
+      </h3>
+
+      <ul class="list-none p-0 m-0 space-y-1">
         {tocTree.map((node) => (
-          <li class="toc-item">
-            <a href={`#${node.heading.slug}`} class="toc-link">
+          <li>
+            <a
+              href={`#${node.heading.slug}`}
+              class="
+                block text-sm text-text no-underline
+                py-1 rounded
+                break-words hyphens-auto
+                transition-colors duration-200 ease-out
+                hover:text-primary hover:underline hover:bg-primary hover:bg-opacity-5 hover:pl-2
+                focus:outline-2 focus:outline-primary focus:outline-offset-2
+                motion-reduce:transition-none
+                toc-link
+              "
+            >
               {node.heading.text}
             </a>
             {node.children.length > 0 && (
-              <ul class="toc-sublist">
+              <ul class="list-none p-0 m-0 ml-4 mt-1 space-y-1 md:ml-3">
                 {node.children.map((child) => (
-                  <li class="toc-item">
-                    <a href={`#${child.heading.slug}`} class="toc-link">
+                  <li>
+                    <a
+                      href={`#${child.heading.slug}`}
+                      class="
+                        block text-xs text-text no-underline
+                        py-1 rounded
+                        break-words hyphens-auto
+                        opacity-90 border-l-2 border-transparent pl-2 -ml-2
+                        transition-colors duration-200 ease-out
+                        hover:text-primary hover:underline hover:bg-primary hover:bg-opacity-5 hover:border-l-primary hover:opacity-100
+                        focus:outline-2 focus:outline-primary focus:outline-offset-2
+                        motion-reduce:transition-none
+                        toc-sublink
+                      "
+                    >
                       {child.heading.text}
                     </a>
                     {child.children.length > 0 && (
-                      <ul class="toc-sublist">
+                      <ul class="list-none p-0 m-0 ml-4 mt-1 space-y-1 md:ml-3">
                         {child.children.map((grandchild) => (
-                          <li class="toc-item">
+                          <li>
                             <a
                               href={`#${grandchild.heading.slug}`}
-                              class="toc-link"
+                              class="
+                                block text-xs text-text no-underline
+                                py-1 rounded font-normal
+                                break-words hyphens-auto
+                                opacity-80 border-l-2 border-transparent pl-2 -ml-2
+                                transition-colors duration-200 ease-out
+                                hover:text-primary hover:underline hover:bg-primary hover:bg-opacity-5 hover:border-l-primary hover:opacity-100
+                                focus:outline-2 focus:outline-primary focus:outline-offset-2
+                                motion-reduce:transition-none
+                                toc-sublink
+                              "
                             >
                               {grandchild.heading.text}
                             </a>
                             {grandchild.children.length > 0 && (
-                              <ul class="toc-sublist">
+                              <ul class="list-none p-0 m-0 ml-4 mt-1 space-y-1 md:ml-3">
                                 {grandchild.children.map((greatgrandchild) => (
-                                  <li class="toc-item">
+                                  <li>
                                     <a
                                       href={`#${greatgrandchild.heading.slug}`}
-                                      class="toc-link"
+                                      class="
+                                        block text-xs text-text no-underline
+                                        py-1 rounded font-normal italic
+                                        break-words hyphens-auto
+                                        opacity-70 border-l-2 border-transparent pl-2 -ml-2
+                                        transition-colors duration-200 ease-out
+                                        hover:text-primary hover:underline hover:bg-primary hover:bg-opacity-5 hover:border-l-primary hover:opacity-100
+                                        focus:outline-2 focus:outline-primary focus:outline-offset-2
+                                        motion-reduce:transition-none
+                                        toc-sublink
+                                      "
                                     >
                                       {greatgrandchild.heading.text}
                                     </a>
@@ -115,59 +184,7 @@ const tocTree = buildTree(filteredHeadings);
 }
 
 <style>
-  .toc {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 1rem;
-    background: var(--color-light, #fafafa);
-    border: 1px solid var(--color-border, #d5d5d5);
-    border-radius: 8px;
-    position: sticky;
-    top: 2rem;
-  }
-
-  .toc-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-text-dark, #152035);
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border, #d5d5d5);
-    padding-bottom: 0.5rem;
-  }
-
-  .toc-list,
-  .toc-sublist {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .toc-sublist {
-    margin-left: 1rem;
-    margin-top: 0.25rem;
-  }
-
-  .toc-item {
-    margin: 0.25rem 0;
-  }
-
-  .toc-link {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--color-text, #747577);
-    text-decoration: none;
-    padding: 0.25rem 0;
-    word-break: break-word;
-    hyphens: auto;
-    transition: color 0.2s ease;
-  }
-
-  .toc-link:hover {
-    color: var(--color-primary, #01ad9f);
-    text-decoration: underline;
-  }
-
-  /* Smooth scrolling for anchor links */
+  /* Global styles that can't be easily done with Tailwind */
   :global(html) {
     scroll-behavior: smooth;
   }
@@ -182,12 +199,159 @@ const tocTree = buildTree(filteredHeadings);
     text-decoration: none;
   }
 
-  /* Mobile responsive adjustments */
-  @media (max-width: 768px) {
-    .toc {
-      position: static;
-      margin-bottom: 2rem;
-      max-height: none;
+  /* Custom animation for fade in up effect */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out;
+  }
+
+  /* Enhanced hover effects for TOC links */
+  .toc-link:hover {
+    transform: translateX(2px);
+    background-color: rgba(1, 173, 159, 0.08);
+  }
+
+  .toc-sublink:hover {
+    transform: translateX(2px);
+    background-color: rgba(1, 173, 159, 0.05);
+  }
+
+  .toc-link:active,
+  .toc-sublink:active {
+    transform: translateX(1px);
+    background-color: rgba(1, 173, 159, 0.12);
+  }
+
+  .toc-link:focus,
+  .toc-sublink:focus {
+    background-color: rgba(1, 173, 159, 0.1);
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-track-light::-webkit-scrollbar-track {
+    background: var(--color-light, #fafafa);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thumb-border::-webkit-scrollbar-thumb {
+    background: var(--color-border, #d5d5d5);
+    border-radius: 3px;
+  }
+
+  nav:hover .scrollbar-thumb-border::-webkit-scrollbar-thumb {
+    background: var(--color-text, #747577);
+  }
+
+  /* Print styles */
+  @media print {
+    nav[aria-label="Table of contents"] {
+      border: 1px solid #ccc !important;
+      background: white !important;
+      box-shadow: none !important;
+      page-break-inside: avoid;
+      margin-bottom: 1rem;
+    }
+
+    .toc-link:after,
+    .toc-sublink:after {
+      content: " (see page content)";
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .toc-link,
+    .toc-sublink {
+      color: #000 !important;
+      text-decoration: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    nav[aria-label="Table of contents"] {
+      border: 2px solid;
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    .toc-link,
+    .toc-sublink {
+      color: LinkText;
+    }
+
+    .toc-link:hover,
+    .toc-link:focus,
+    .toc-sublink:hover,
+    .toc-sublink:focus {
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in-up {
+      animation: none;
+    }
+
+    .toc-link,
+    .toc-sublink {
+      transition: none;
+      transform: none;
+    }
+
+    .toc-link:hover,
+    .toc-link:active,
+    .toc-sublink:hover,
+    .toc-sublink:active {
+      transform: none;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    nav[aria-label="Table of contents"] {
+      background: #1a1a1a;
+      border-color: #333;
+      color: #e5e5e5;
+    }
+
+    h3 {
+      color: #f5f5f5;
+      border-bottom-color: #333;
+    }
+
+    .toc-link,
+    .toc-sublink {
+      color: #b3b3b3;
+    }
+
+    .toc-link:hover,
+    .toc-sublink:hover {
+      color: #01d4c4;
+      background-color: rgba(1, 173, 159, 0.1);
+    }
+
+    .scrollbar-track-light::-webkit-scrollbar-track {
+      background: #2a2a2a;
+    }
+
+    .scrollbar-thumb-border::-webkit-scrollbar-thumb {
+      background: #555;
     }
   }
 </style>
