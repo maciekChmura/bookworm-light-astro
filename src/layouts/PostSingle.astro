@@ -9,11 +9,12 @@ import { humanize, markdownify, slugify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import { render } from "astro:content";
 import { BiCalendarEdit, BiCategoryAlt } from "react-icons/bi";
+import config from "@/config/config.json";
 
 const allAuthors = await getSinglePage("authors");
 const posts = await getSinglePage("posts");
 const { post } = Astro.props;
-const similarPosts = similerItems(post, posts, post.slug);
+const similarPosts = similerItems(post, posts, post.id);
 const { Content, headings } = await render(post);
 const { title, description, authors, categories, image, date, tags } =
   post.data;
@@ -21,7 +22,134 @@ const { title, description, authors, categories, image, date, tags } =
 // Get TOC configuration from frontmatter or use defaults
 const tocMinDepth = post.data.tocMinDepth || 2;
 const tocMaxDepth = post.data.tocMaxDepth || 4;
+
+// Generate URLs for structured data
+const siteUrl = config.site.base_url;
+const postUrl = `${siteUrl}/${post.id}`;
+const imageUrl = image
+  ? `${siteUrl}${image}`
+  : `${siteUrl}${config.metadata.meta_image}`;
+
+// Get post authors for structured data
+const postAuthors = allAuthors.filter((author) =>
+  authors
+    .map((author: string) => slugify(author))
+    .includes(slugify(author.data.title)),
+);
+
+// Generate structured data
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      url: siteUrl,
+      name: config.site.title,
+      description: config.metadata.meta_description,
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: config.site.title,
+      url: siteUrl,
+      logo: {
+        "@type": "ImageObject",
+        "@id": `${siteUrl}/#logo`,
+        url: `${siteUrl}${config.site.logo}`,
+        contentUrl: `${siteUrl}${config.site.logo}`,
+      },
+      image: { "@id": `${siteUrl}/#logo` },
+    },
+    {
+      "@type": "WebPage",
+      "@id": postUrl,
+      url: postUrl,
+      name: title,
+      isPartOf: { "@id": `${siteUrl}/#website` },
+      primaryImageOfPage: { "@id": `${postUrl}#primaryimage` },
+      breadcrumb: { "@id": `${postUrl}#breadcrumb` },
+      inLanguage: "en",
+      datePublished: new Date(date).toISOString(),
+      dateModified: post.data.lastmod
+        ? new Date(post.data.lastmod).toISOString()
+        : new Date(date).toISOString(),
+      description: description,
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${postUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: siteUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Articles",
+          item: `${siteUrl}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: title,
+          item: postUrl,
+        },
+      ],
+    },
+    {
+      "@type": "Article",
+      "@id": `${postUrl}#article`,
+      url: postUrl,
+      isPartOf: { "@id": postUrl },
+      mainEntityOfPage: { "@id": postUrl },
+      headline: title,
+      description: description,
+      datePublished: new Date(date).toISOString(),
+      dateModified: post.data.lastmod
+        ? new Date(post.data.lastmod).toISOString()
+        : new Date(date).toISOString(),
+      inLanguage: "en",
+      author:
+        postAuthors.length === 1
+          ? {
+              "@type": "Person",
+              name: postAuthors[0].data.title,
+              url: `${siteUrl}/authors/${slugify(postAuthors[0].id)}`,
+            }
+          : postAuthors.map((author) => ({
+              "@type": "Person",
+              name: author.data.title,
+              url: `${siteUrl}/authors/${slugify(author.id)}`,
+            })),
+      publisher: { "@id": `${siteUrl}/#organization` },
+      image: [{ "@id": `${postUrl}#primaryimage` }],
+      thumbnailUrl: imageUrl,
+      articleSection: categories.length > 0 ? categories[0] : "",
+      keywords: tags.length > 0 ? tags : undefined,
+    },
+    {
+      "@type": "ImageObject",
+      "@id": `${postUrl}#primaryimage`,
+      url: imageUrl,
+      contentUrl: imageUrl,
+    },
+  ],
+};
 ---
+
+<!-- Structured Data -->
+<head>
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(structuredData)}
+  />
+</head>
 
 <section class="section">
   <div class="container">
