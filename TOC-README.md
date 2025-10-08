@@ -90,32 +90,20 @@ Structure your content with proper heading hierarchy:
 
 ## Styling Options
 
-### Default Styling
+### Tailwind CSS Styling
 
-The component includes built-in CSS that:
-- Uses theme color variables for consistency
-- Provides hover and focus states
-- Implements responsive behavior
-- Includes smooth scrolling
-
-### Enhanced Styling
-
-For additional visual polish, import the optional CSS file:
-
-```astro
----
-// In PostSingle.astro or globally
-import "@/styles/toc.css";
----
-```
-
-The enhanced CSS includes:
-- Subtle animations and transitions
-- Enhanced focus states for accessibility
+The component is built entirely with Tailwind CSS classes and includes:
+- Theme color integration via CSS custom properties
+- Responsive design with mobile-first approach
+- Hover and focus states with smooth transitions
+- Enhanced accessibility features
 - Dark mode support
 - High contrast mode support
 - Print-friendly styles
 - Reduced motion preferences
+- Custom animations and micro-interactions
+
+All styling is self-contained within the component - no external CSS files needed.
 
 ## Configuration Options
 
@@ -189,7 +177,7 @@ tocMaxDepth: 4
 
 - **Zero JavaScript**: No client-side performance impact
 - **Build-time generation**: TOC is generated during build phase
-- **Minimal CSS**: Lightweight styling with optional enhancements
+- **Tailwind CSS**: Utility-first styling with no external CSS dependencies
 - **Responsive images**: No additional image assets required
 
 ## Troubleshooting
@@ -226,16 +214,18 @@ Potential future additions (not included in base implementation):
 When modifying the TOC feature:
 
 1. Maintain accessibility standards
-2. Ensure responsive behavior works across devices
+2. Ensure responsive behavior works across devices  
 3. Test with various content structures
-4. Update documentation for any new features
-5. Follow existing code style and conventions
+4. Use Tailwind CSS utilities consistently with the theme
+5. Update documentation for any new features
+6. Follow existing code style and conventions
 
 ## Dependencies
 
 - `rehype-slug`: Automatic heading ID generation
 - `rehype-autolink-headings`: Clickable anchor links
 - Astro's built-in `render()` function for heading extraction
+- Tailwind CSS: Utility-first CSS framework (already included in theme)
 
 ## License
 
