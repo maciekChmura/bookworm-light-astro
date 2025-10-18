@@ -25,10 +25,27 @@ const tocMaxDepth = post.data.tocMaxDepth || 4;
 
 // Generate URLs for structured data
 const siteUrl = config.site.base_url;
-const postUrl = `${siteUrl}/${post.id}`;
-const imageUrl = image
-  ? `${siteUrl}${image}`
-  : `${siteUrl}${config.metadata.meta_image}`;
+const basePath = config.site.base_path || "/";
+const baseUrl = new URL(
+  basePath.endsWith("/") ? basePath : `${basePath}/`,
+  siteUrl,
+);
+const siteBase = baseUrl.href.replace(/\/$/, "");
+const toBasePathUrl = (path = "") =>
+  path
+    ? new URL(path.startsWith("/") ? path.slice(1) : path, baseUrl).toString()
+    : siteBase;
+const resolveAssetUrl = (assetPath: string | undefined) => {
+  if (!assetPath) {
+    return toBasePathUrl(config.metadata.meta_image);
+  }
+  return /^https?:\/\//i.test(assetPath)
+    ? assetPath
+    : toBasePathUrl(assetPath);
+};
+const postUrl = toBasePathUrl(post.id);
+const imageUrl = resolveAssetUrl(image);
+const logoUrl = resolveAssetUrl(config.site.logo);
 
 // Get post authors for structured data
 const postAuthors = allAuthors.filter((author) =>
@@ -38,39 +55,46 @@ const postAuthors = allAuthors.filter((author) =>
 );
 
 // Generate structured data
+const keywords = tags && tags.length ? tags.join(", ") : undefined;
+const websiteId = new URL("#website", baseUrl).toString();
+const organizationId = new URL("#organization", baseUrl).toString();
+const logoId = new URL("#logo", baseUrl).toString();
+const breadcrumbId = `${postUrl}#breadcrumb`;
+const primaryImageId = `${postUrl}#primaryimage`;
+const articleId = `${postUrl}#article`;
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": `${siteUrl}/#website`,
-      url: siteUrl,
+      "@id": websiteId,
+      url: siteBase,
       name: config.site.title,
       description: config.metadata.meta_description,
-      publisher: { "@id": `${siteUrl}/#organization` },
+      publisher: { "@id": organizationId },
       inLanguage: "en",
     },
     {
       "@type": "Organization",
-      "@id": `${siteUrl}/#organization`,
+      "@id": organizationId,
       name: config.site.title,
-      url: siteUrl,
+      url: siteBase,
       logo: {
         "@type": "ImageObject",
-        "@id": `${siteUrl}/#logo`,
-        url: `${siteUrl}${config.site.logo}`,
-        contentUrl: `${siteUrl}${config.site.logo}`,
+        "@id": logoId,
+        url: logoUrl,
+        contentUrl: logoUrl,
       },
-      image: { "@id": `${siteUrl}/#logo` },
+      image: { "@id": logoId },
     },
     {
       "@type": "WebPage",
       "@id": postUrl,
       url: postUrl,
       name: title,
-      isPartOf: { "@id": `${siteUrl}/#website` },
-      primaryImageOfPage: { "@id": `${postUrl}#primaryimage` },
-      breadcrumb: { "@id": `${postUrl}#breadcrumb` },
+      isPartOf: { "@id": websiteId },
+      primaryImageOfPage: { "@id": primaryImageId },
+      breadcrumb: { "@id": breadcrumbId },
       inLanguage: "en",
       datePublished: new Date(date).toISOString(),
       dateModified: post.data.lastmod
@@ -80,19 +104,19 @@ const structuredData = {
     },
     {
       "@type": "BreadcrumbList",
-      "@id": `${postUrl}#breadcrumb`,
+      "@id": breadcrumbId,
       itemListElement: [
         {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: siteUrl,
+          item: siteBase,
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Articles",
-          item: `${siteUrl}/`,
+          item: siteBase,
         },
         {
           "@type": "ListItem",
@@ -104,7 +128,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      "@id": `${postUrl}#article`,
+      "@id": articleId,
       url: postUrl,
       isPartOf: { "@id": postUrl },
       mainEntityOfPage: { "@id": postUrl },
@@ -120,34 +144,38 @@ const structuredData = {
           ? {
               "@type": "Person",
               name: postAuthors[0].data.title,
-              url: `${siteUrl}/authors/${slugify(postAuthors[0].id)}`,
+              url: toBasePathUrl(`authors/${slugify(postAuthors[0].id)}`),
             }
           : postAuthors.map((author) => ({
               "@type": "Person",
               name: author.data.title,
-              url: `${siteUrl}/authors/${slugify(author.id)}`,
+              url: toBasePathUrl(`authors/${slugify(author.id)}`),
             })),
-      publisher: { "@id": `${siteUrl}/#organization` },
-      image: [{ "@id": `${postUrl}#primaryimage` }],
+      publisher: { "@id": organizationId },
+      image: [{ "@id": primaryImageId }],
       thumbnailUrl: imageUrl,
       articleSection: categories.length > 0 ? categories[0] : "",
-      keywords: tags.length > 0 ? tags : undefined,
+      keywords,
     },
     {
       "@type": "ImageObject",
-      "@id": `${postUrl}#primaryimage`,
+      "@id": primaryImageId,
       url: imageUrl,
       contentUrl: imageUrl,
     },
   ],
 };
+const structuredDataString = JSON.stringify(structuredData).replace(
+  /</g,
+  "\\u003c",
+);
 ---
 
 <!-- Structured Data -->
 <head>
   <script
     type="application/ld+json"
-    set:html={JSON.stringify(structuredData)}
+    set:html={structuredDataString}
   />
 </head>
 
