@@ -7,6 +7,8 @@ import { defineConfig } from "astro/config";
 import remarkCollapse from "remark-collapse";
 import remarkToc from "remark-toc";
 import sharp from "sharp";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import config from "./src/config/config.json";
 
 // https://astro.build/config
@@ -33,7 +35,22 @@ export default defineConfig({
     mdx(),
   ],
   markdown: {
-    remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
+    remarkPlugins: [
+      remarkToc,
+      [remarkCollapse, { test: "Table of contents" }],
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "wrap",
+          properties: {
+            className: ["anchor-link"],
+          },
+        },
+      ],
+    ],
     shikiConfig: { theme: "one-dark-pro", wrap: true },
     extendDefaultPlugins: true,
   },
