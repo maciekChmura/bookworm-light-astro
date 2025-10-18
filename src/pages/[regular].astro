@@ -1,24 +1,40 @@
 ---
 import Base from "@/layouts/Base.astro";
+import PostSingle from "@/layouts/partials/PostSingle.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import { render } from "astro:content";
 
-export async function getStaticPaths() {
-  const pages = await getSinglePage("pages");
+type PageEntry = Awaited<ReturnType<typeof getSinglePage>>[number];
 
-  const paths = pages.map((page) => ({
-    params: {
-      regular: page.slug,
-    },
-    props: { page },
-  }));
-  return paths;
+export async function getStaticPaths() {
+  const [pages, posts] = await Promise.all([
+    getSinglePage("pages"),
+    getSinglePage("posts"),
+  ]);
+
+  return [
+    ...pages.map((entry) => ({
+      params: { regular: entry.slug },
+      props: { entry, type: "page" as const },
+    })),
+    ...posts.map((entry) => ({
+      params: { regular: entry.id },
+      props: { entry, type: "post" as const },
+    })),
+  ];
 }
 
-const { page } = Astro.props;
-const { title, meta_title, description, image } = page.data;
-const { Content } = await render(page);
+const { entry, type }: { entry: PageEntry; type: "page" | "post" } =
+  Astro.props;
+
+let Content: Awaited<ReturnType<typeof render>>["Content"] | null = null;
+
+if (type === "page") {
+  ({ Content } = await render(entry));
+}
+
+const { title, meta_title, description, image } = entry.data;
 ---
 
 <Base
@@ -27,12 +43,18 @@ const { Content } = await render(page);
   description={description}
   image={image}
 >
-  <section class="section">
-    <div class="container">
-      <h1 set:html={markdownify(title)} class="h2 page-heading" />
-      <div class="content">
-        <Content />
-      </div>
-    </div>
-  </section>
+  {
+    type === "page" && Content ? (
+      <section class="section">
+        <div class="container">
+          <h1 set:html={markdownify(title)} class="h2 page-heading" />
+          <div class="content">
+            <Content />
+          </div>
+        </div>
+      </section>
+    ) : (
+      <PostSingle post={entry} />
+    )
+  }
 </Base>
