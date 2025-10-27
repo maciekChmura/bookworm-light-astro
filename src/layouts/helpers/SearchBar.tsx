@@ -12,6 +12,7 @@ export type SearchItem = {
 
 interface Props {
   searchList: SearchItem[];
+  basePath?: string;
 }
 
 interface SearchResult {
@@ -19,7 +20,7 @@ interface SearchResult {
   refIndex: number;
 }
 
-export default function SearchBar({ searchList }: Props) {
+export default function SearchBar({ searchList, basePath = "/" }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputVal, setInputVal] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(
@@ -92,7 +93,7 @@ export default function SearchBar({ searchList }: Props) {
           <div key={item.slug} className={"col-12 mb-8 sm:col-6"}>
             {item.data.image && (
               <a
-                href={`/${item.slug}`}
+                href={`${basePath}${item.slug}`}
                 className="rounded-lg block hover:text-primary overflow-hidden group"
               >
                 <img
@@ -117,7 +118,7 @@ export default function SearchBar({ searchList }: Props) {
                     {item.data.categories.map((category: string, i: number) => (
                       <li key={i} className="inline-block">
                         <a
-                          href={`/categories/${slugify(category)}`}
+                          href={`${basePath}categories/${slugify(category)}`}
                           className="mr-2 hover:text-primary font-medium"
                         >
                           {humanize(category)}
@@ -132,15 +133,13 @@ export default function SearchBar({ searchList }: Props) {
 
             <h3 className="mb-2">
               <a
-                href={`/${item.slug}`}
+                href={`${basePath}${item.slug}`}
                 className="block hover:text-primary transition duration-300"
               >
                 {item.data.title}
               </a>
             </h3>
-            <p className="text-text line-clamp-2">
-              {item.content}
-            </p>
+            <p className="text-text line-clamp-2">{item.content}</p>
           </div>
         ))}
       </div>

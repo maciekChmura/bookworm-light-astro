@@ -8,22 +8,40 @@ const {
   logo_height,
   logo_text,
   title,
+  base_path,
 }: {
   logo: string;
   logo_width: any;
   logo_height: any;
   logo_text: string;
   title: string;
+  base_path: string;
 } = config.site;
+
+const basePathConfig = base_path || "/";
+const basePath = basePathConfig.endsWith("/")
+  ? basePathConfig
+  : `${basePathConfig}/`;
 ---
 
-<a href="/" class="navbar-brand block">
+<a href={basePath} class="navbar-brand block">
   {
-    src || logo ? (
+    src ? (
       <Image
         width={logo_width.replace("px", "") * 2}
         height={logo_height.replace("px", "") * 2}
-        src={src ? src : logo}
+        src={src}
+        alt={title}
+        style={{
+          height: logo_height.replace("px", "") + "px",
+          width: logo_width.replace("px", "") + "px",
+        }}
+      />
+    ) : logo ? (
+      <img
+        width={logo_width.replace("px", "")}
+        height={logo_height.replace("px", "")}
+        src={logo}
         alt={title}
         style={{
           height: logo_height.replace("px", "") + "px",

@@ -1,4 +1,5 @@
 ---
+import config from "@/config/config.json";
 import Share from "@/components/Share.astro";
 import SimilarPosts from "@/components/SimilarPosts.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
@@ -9,7 +10,6 @@ import { humanize, markdownify, slugify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import { render } from "astro:content";
 import { BiCalendarEdit, BiCategoryAlt } from "react-icons/bi";
-import config from "@/config/config.json";
 
 const allAuthors = await getSinglePage("authors");
 const posts = await getSinglePage("posts");
@@ -194,11 +194,11 @@ const structuredDataString = JSON.stringify(structuredData).replace(
                     .map((author: string) => slugify(author))
                     .includes(slugify(author.data.title)),
                 )
-                .map((author) => (
-                  <a
-                    href={`/authors/${slugify(author.id)}`}
-                    class="flex items-center hover:text-primary font-medium"
-                  >
+                 .map((author) => (
+                   <a
+                     href={`${basePath}authors/${slugify(author.id)}`}
+                     class="flex items-center hover:text-primary font-medium"
+                   >
                     {author.data.image && (
                       <Image
                         src={author.data.image}
@@ -224,10 +224,10 @@ const structuredDataString = JSON.stringify(structuredData).replace(
               {
                 categories.map((category: string, i: number) => (
                   <li class="inline-block">
-                    <a
-                      href={`/categories/${slugify(category)}`}
-                      class="mr-2 hover:text-primary font-medium"
-                    >
+                     <a
+                       href={`${basePath}categories/${slugify(category)}`}
+                       class="mr-2 hover:text-primary font-medium"
+                     >
                       {humanize(category)}
                       {i !== post.data.categories.length - 1 && ","}
                     </a>
@@ -286,10 +286,10 @@ const structuredDataString = JSON.stringify(structuredData).replace(
             {
               tags.map((tag: string) => (
                 <li class="inline-block">
-                  <a
-                    href={`/tags/${slugify(tag)}`}
-                    class="block rounded-lg bg-light px-4 py-2 font-semibold text-dark text-sm hover:text-primary transition duration-300"
-                  >
+                   <a
+                     href={`${basePath}tags/${slugify(tag)}`}
+                     class="block rounded-lg bg-light px-4 py-2 font-semibold text-dark text-sm hover:text-primary transition duration-300"
+                   >
                     #{humanize(tag)}
                   </a>
                 </li>

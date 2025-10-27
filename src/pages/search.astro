@@ -1,4 +1,5 @@
 ---
+import config from "@/config/config.json";
 import SearchBar from "@/helpers/SearchBar";
 import Base from "@/layouts/Base.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
@@ -12,12 +13,16 @@ const searchList = posts.map((item) => ({
   data: item.data,
   content: item.body,
 }));
+
+const basePath = config.site.base_path.endsWith("/")
+  ? config.site.base_path
+  : `${config.site.base_path}/`;
 ---
 
 <Base title={`Search`}>
   <section class="section">
     <div class="container">
-      <SearchBar client:load searchList={searchList} />
+      <SearchBar client:load searchList={searchList} basePath={basePath} />
     </div>
   </section>
 </Base>

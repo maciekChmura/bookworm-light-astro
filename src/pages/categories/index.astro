@@ -1,4 +1,5 @@
 ---
+import config from "@/config/config.json";
 import Base from "@/layouts/Base.astro";
 import { getTaxonomy } from "@/lib/taxonomyParser.astro";
 import { humanize } from "@/lib/utils/textConverter";
@@ -6,6 +7,10 @@ import { humanize } from "@/lib/utils/textConverter";
 const categories = await getTaxonomy("posts", "categories");
 
 import { BiCategoryAlt } from "react-icons/bi";
+
+const basePath = config.site.base_path.endsWith("/")
+  ? config.site.base_path
+  : `${config.site.base_path}/`;
 ---
 
 <Base title={"Categories"}>
@@ -16,10 +21,10 @@ import { BiCategoryAlt } from "react-icons/bi";
         {
           categories.map((category) => (
             <li class="inline-block">
-              <a
-                href={`/categories/${category}`}
-                class="rounded-lg bg-light px-4 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
-              >
+               <a
+                 href={`${basePath}categories/${category}`}
+                 class="rounded-lg bg-light px-4 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
+               >
                 <BiCategoryAlt className="mr-1 text-primary group-hover:text-white transition h-6 w-6 scale-75" />
                 {humanize(category || "")}
               </a>

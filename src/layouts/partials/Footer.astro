@@ -4,25 +4,30 @@ import config from "@/config/config.json";
 import menu from "@/config/menu.json";
 import social from "@/config/social.json";
 import { markdownify } from "@/lib/utils/textConverter";
+
+const basePathConfig = config.site.base_path || "/";
+const basePath = basePathConfig.endsWith("/")
+  ? basePathConfig
+  : `${basePathConfig}/`;
 ---
 
 <footer class="section bg-dark">
   <div class="container text-center">
     {/* footer menu */}
-    <ul class="mb-8 space-x-4">
-      {
-        menu.footer.map((menu) => (
-          <li class="inline-block">
-            <a
-              href={menu.url}
-              class="p-4 text-white/75 hover:text-white transition-all"
-            >
-              {menu.name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+     <ul class="mb-8 space-x-4">
+       {
+         menu.footer.map((menu) => (
+           <li class="inline-block">
+             <a
+               href={`${basePath}${menu.url.replace(/^\//, "")}`}
+               class="p-4 text-white/75 hover:text-white transition-all"
+             >
+               {menu.name}
+             </a>
+           </li>
+         ))
+       }
+     </ul>
     {/* social icons */}
     <Social source={social.main} className="social-icons mb-8" />
     {/* copyright */}

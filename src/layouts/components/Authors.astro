@@ -1,4 +1,5 @@
 ---
+import config from "@/config/config.json";
 import { markdownify } from "@/lib/utils/textConverter";
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
@@ -8,6 +9,9 @@ type Props = {
   authors: CollectionEntry<"authors">[];
 };
 const { authors } = Astro.props;
+const basePath = config.site.base_path.endsWith("/")
+  ? config.site.base_path
+  : `${config.site.base_path}/`;
 ---
 
 <div class="row justify-center">
@@ -25,11 +29,11 @@ const { authors } = Astro.props;
             />
           </div>
         )}
-        <h3 class="h4 mt-8 mb-3">
-          <a
-            href={`/authors/${author.id}`}
-            class="block hover:text-primary transition duration-200"
-          >
+         <h3 class="h4 mt-8 mb-3">
+           <a
+             href={`${basePath}authors/${author.id}`}
+             class="block hover:text-primary transition duration-200"
+           >
             {author.data.title}
           </a>
         </h3>
@@ -37,10 +41,10 @@ const { authors } = Astro.props;
           <p class="mb-3" set:text={markdownify(author.body.slice(0, 100))} />
         )}
 
-        <a
-          href={`/authors/${author.id}`}
-          class="inline-flex items-center text-primary transition duration-200 hover:opacity-70"
-        >
+         <a
+           href={`${basePath}authors/${author.id}`}
+           class="inline-flex items-center text-primary transition duration-200 hover:opacity-70"
+         >
           Read More <BsArrowRightCircle className="inline ml-2" />
         </a>
       </div>

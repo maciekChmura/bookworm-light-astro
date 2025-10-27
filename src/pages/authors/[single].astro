@@ -1,4 +1,5 @@
 ---
+import config from "@/config/config.json";
 import Base from "@/layouts/Base.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import dateFormat from "@/lib/utils/dateFormat";
@@ -33,6 +34,10 @@ const currentPosts = sortPostsByDate.filter((post) => {
     .map((author) => slugify(author))
     .includes(slugify(title));
 });
+
+const basePath = config.site.base_path.endsWith("/")
+  ? config.site.base_path
+  : `${config.site.base_path}/`;
 ---
 
 <Base
@@ -53,11 +58,11 @@ const currentPosts = sortPostsByDate.filter((post) => {
           >
             {currentPosts.map((post) => (
               <div class="col-12 sm:col-6 lg:col-4">
-                {post.data.image && (
-                  <a
-                    href={`/${post.id}`}
-                    class="rounded-lg block hover:text-primary overflow-hidden group"
-                  >
+                 {post.data.image && (
+                   <a
+                     href={`${basePath}${post.id}`}
+                     class="rounded-lg block hover:text-primary overflow-hidden group"
+                   >
                     <Image
                       class="group-hover:scale-[1.05] transition duration-300 w-full"
                       src={post.data.image}
@@ -78,10 +83,10 @@ const currentPosts = sortPostsByDate.filter((post) => {
                     <ul>
                       {post.data.categories.map((category, i: number) => (
                         <li class="inline-block">
-                          <a
-                            href={`/categories/${slugify(category)}`}
-                            class="mr-2 hover:text-primary font-medium"
-                          >
+                           <a
+                             href={`${basePath}categories/${slugify(category)}`}
+                             class="mr-2 hover:text-primary font-medium"
+                           >
                             {humanize(category)}
                             {i !== post.data.categories.length - 1 && ","}
                           </a>
@@ -90,11 +95,11 @@ const currentPosts = sortPostsByDate.filter((post) => {
                     </ul>
                   </li>
                 </ul>
-                <h3 class="h5">
-                  <a
-                    href={`/${post.id}`}
-                    class="block hover:text-primary transition duration-300"
-                  >
+                 <h3 class="h5">
+                   <a
+                     href={`${basePath}${post.id}`}
+                     class="block hover:text-primary transition duration-300"
+                   >
                     {post.data.title}
                   </a>
                 </h3>
